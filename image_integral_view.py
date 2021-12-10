@@ -1,10 +1,11 @@
 import random
 import copy
+import openpyxl
 
 
 def print_matrix(matrix: list[list]):
     for row in matrix:
-        print(*row)
+        print(row)
 
 
 def generate_random_matrix(width: int, height: int) -> list[list]:
@@ -33,3 +34,69 @@ def rect_sum(image: list[list], x1: int, y1: int, x2: int, y2: int) -> int:
     d_sum = integral_matrix[y2][x1 - 1] if x1 > 0 else 0
 
     return a_sum + c_sum - d_sum - b_sum
+
+
+def get_xlsx_input() -> list[list]:
+    wb = openpyxl.load_workbook("xslx_input.xlsx")
+    sheet = wb["Sheet1"]
+    row_count = sheet.max_row + 1
+    column_count = sheet.max_column + 1
+
+    try:
+        a = [[int(sheet.cell(x, y).value) for y in range(1, column_count)] for x in range(1, row_count)]
+        return a
+    except TypeError:
+        quit("Что-то пошло не так, попробуйте заполнить целочисленными значениями пустые клетки")
+
+
+def get_input():
+    u_input = None
+    got_input = False
+    input_message = 'Введите 4 целых числа >= 1 x1;y1;x2;y2 через ";" ' \
+                    '\nгде x1, y1 - координаты левого верхнего угла прямоугольника, ' \
+                    'а x2, y2 - координаты правого нижнего: '
+    while not got_input:
+        input_request = input(input_message)
+        try:
+            raw_input = [int(i) for i in input_request.strip().split(';') if i != '']
+        except ValueError:
+            print('Пример "1;2;3;4"')
+            continue
+        u_input = raw_input
+        got_input = True
+    return u_input
+
+
+def main():
+    image = get_xlsx_input()
+    coordinates = None
+    while True:
+        coordinates = get_input()
+
+        passed_check = True
+        for i in coordinates:
+            if i < 1:
+                passed_check = False
+                print("Координаты должны быть > 1")
+                break
+        if not passed_check: continue
+
+        if coordinates[0] > len(image[0]) or coordinates[2] > len(image[0]):
+            print(f"x координыты должны быть <= {len(image[0])}")
+            continue
+        if coordinates[1] > len(image) or coordinates[3] > len(image):
+            print(f"y координыты должны быть <= {len(image)}")
+            continue
+        break
+    print("Изначальная матрица")
+    print_matrix(image)
+    print("Интегральная матрица")
+    print_matrix(integral_view(image))
+
+    user_rect_sum = rect_sum(image, coordinates[0] - 1, coordinates[1] - 1, coordinates[2] - 1, coordinates[3] -1)
+
+    print(f'Сумма значений внутри прямоугольника c координатами '
+          f'{coordinates[0]},{coordinates[1]},{coordinates[2]},{coordinates[3]} : {user_rect_sum}')
+
+
+main()
