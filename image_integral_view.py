@@ -22,3 +22,14 @@ def integral_view(image: list[list]) -> list[list]:
             integral_matrix[y][x] += left_cell + up_cell - diagonal_cell
 
     return integral_matrix
+
+
+def rect_sum(image: list[list], x1: int, y1: int, x2: int, y2: int) -> int:
+    integral_matrix = integral_view(image)
+
+    a_sum = integral_matrix[y1 - 1][x1 - 1] if y1 > 0 and x1 > 0 else 0
+    b_sum = integral_matrix[y1 - 1][x2] if y1 > 0 else 0
+    c_sum = integral_matrix[y2][x2]
+    d_sum = integral_matrix[y2][x1 - 1] if x1 > 0 else 0
+
+    return a_sum + c_sum - d_sum - b_sum
