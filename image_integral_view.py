@@ -4,15 +4,29 @@ import openpyxl
 
 
 def print_matrix(matrix: list[list]):
+    """
+    Выводит матрицу
+    :param matrix: матрица для вывода
+    """
     for row in matrix:
         print(row)
 
 
 def generate_random_matrix(width: int, height: int) -> list[list]:
+    """
+    :param width: ширина матрицы
+    :param height: высота матрицы
+    :return: матрица размерностью width*height,
+    заполненная случайными цислами от 0 до 255
+    """
     return [[random.randint(0, 255) for x in range(width)] for y in range(height)]
 
 
 def integral_view(image: list[list]) -> list[list]:
+    """
+    :param image: матрица, заполненная числами типа int
+    :return: интегральное представление исходной матрицы, с такой же размерностью
+    """
     integral_matrix = copy.deepcopy(image)
 
     for y in range(len(integral_matrix)):
@@ -26,6 +40,15 @@ def integral_view(image: list[list]) -> list[list]:
 
 
 def rect_sum(image: list[list], x1: int, y1: int, x2: int, y2: int) -> int:
+    """
+    Вычисляет сумму чисел внутри прямоугольника
+    :param image: матрица, заполненная числами типа int
+    :param x1: координата x левого верхнего угла прямоугольника
+    :param y1: координата y левого верхнего угла прямоугольника
+    :param x2: координата x правого нижнего угла прямоугольника
+    :param y2: координата y правого нижнего угла прямоугольника
+    :return: сумма чисел внутри прямоугольника
+    """
     integral_matrix = integral_view(image)
 
     a_sum = integral_matrix[y1 - 1][x1 - 1] if y1 > 0 and x1 > 0 else 0
@@ -37,6 +60,10 @@ def rect_sum(image: list[list], x1: int, y1: int, x2: int, y2: int) -> int:
 
 
 def get_xlsx_input() -> list[list]:
+    """
+    Считывает из файла типа .xslx матрицу
+    :return: матрица
+    """
     wb = openpyxl.load_workbook("xslx_input.xlsx")
     sheet = wb["Sheet1"]
     row_count = sheet.max_row + 1
@@ -50,6 +77,10 @@ def get_xlsx_input() -> list[list]:
 
 
 def get_input():
+    """
+    Запрашивает у пользователя на ввод 4 координаты прямоугольника
+    :return: координаты прямоугольника
+    """
     u_input = None
     got_input = False
     input_message = 'Введите 4 целых числа >= 1 x1;y1;x2;y2 через ";" ' \
@@ -68,6 +99,9 @@ def get_input():
 
 
 def main():
+    """
+    Основная логика
+    """
     image = get_xlsx_input()
     coordinates = None
     while True:
