@@ -1,5 +1,4 @@
 # Про интегральное представление изображения
-
 Проект включает в себя 2 функции, связанные с интегральным представлением матрицы.
 
 - Интегральное представление матрицы
@@ -33,3 +32,73 @@
 > B – все прямоугольники верхнего ряда,<br />
 > C – все прямоугольники,<br />
 > D – все прямоугольники левой колонки.
+
+Пример суммы пикселей в произвольном прямоугольнике
+![IntegralExample](https://user-images.githubusercontent.com/57265131/147665676-409396cd-9d65-4c0b-a81d-c34d75ee1a2c.png)<br />
+Еще о интегральном представлении можно почитать [здесь](https://robocraft.ru/blog/computervision/536.html)
+
+# Функция integral_view
+Вычисляет интегральное представление исходной матрицы, с такой же размерностью.
+```
+def integral_view(image: list[list]) -> list[list]:
+    """
+    :param image: матрица, заполненная числами типа int
+    :return: интегральное представление исходной матрицы, с такой же размерностью
+    """
+    integral_matrix = copy.deepcopy(image)
+
+    for y in range(len(integral_matrix)):
+        for x in range(len(integral_matrix[0])):
+            left_cell = integral_matrix[y][x - 1] if x > 0 else 0
+            up_cell = integral_matrix[y - 1][x] if y > 0 else 0
+            diagonal_cell = integral_matrix[y - 1][x - 1] if x > 0 and y > 0 else 0
+            integral_matrix[y][x] += left_cell + up_cell - diagonal_cell
+
+    return integral_matrix
+```
+Пример использования:
+```
+>>> matrix = [[1, 69], [69, 120]]
+>>> integral_matrix = integral_view(matrix)
+>>> print(integral_matrix)
+[[1, 70], [70, 259]]
+```
+# Функция rect_sum
+Вычисляет сумму чисел внутри прямоугольника.
+```
+def rect_sum(image: list[list], x1: int, y1: int, x2: int, y2: int) -> int:
+    """
+    Вычисляет сумму чисел внутри прямоугольника
+    :param image: матрица, заполненная числами типа int
+    :param x1: координата x левого верхнего угла прямоугольника
+    :param y1: координата y левого верхнего угла прямоугольника
+    :param x2: координата x правого нижнего угла прямоугольника
+    :param y2: координата y правого нижнего угла прямоугольника
+    :return: сумма чисел внутри прямоугольника
+    """
+    integral_matrix = integral_view(image)
+
+    a_sum = integral_matrix[y1 - 1][x1 - 1] if y1 > 0 and x1 > 0 else 0
+    b_sum = integral_matrix[y1 - 1][x2] if y1 > 0 else 0
+    c_sum = integral_matrix[y2][x2]
+    d_sum = integral_matrix[y2][x1 - 1] if x1 > 0 else 0
+
+    return a_sum + c_sum - d_sum - b_sum
+```
+Пример использования:
+```
+>>> matrix = [[1, 69], [69, 120]]
+>>> r_sum = rect_sum(matrix, 0, 0, 1, 1)
+>>> print(r_sum)
+259
+```
+
+# Как использовать?
+Программа берет исходную матрицу из файла input.xlsx в корне проекта.<br />
+Файл можно реадактировать в [Sheets](https://docs.google.com/spreadsheets) или в [Excel](https://www.office.com/launch/excel?ui=en-US&rs=US&auth=1).<br />
+Файл должен содержать только цифры типа int.
+
+При использовании программа запрашивает у пользователя на ввод 4 координаты. 
+Первые 2 координаты - координаты левого верхнего угла прямоугольника, остальные 2 - координаты правого верхнего угла прямоугольника.
+
+Программа выводит сумму внктри цифр прямоугольника с введенными координатами.
